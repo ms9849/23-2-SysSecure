@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>단국대학교 통합 로그인</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Cache-Control" content="no-cache" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0"
+    />
+    <meta name="author" content="포털시스템,단국대학교,통합로그인,로그인" />
+    <meta
+      name="description"
+      content="단국대학교 포털,포털,단국대학교,통합로그인,로그인"
+    />
+    <meta name="robots" content="index" />
+    <script type="text/javascript" src="js/js-jquery.min.js"></script>
+    <script src="js/js-jquery-1.7.2.min.js"></script>
+    <script src="js/js-jquery.bxslider.js"></script>
+    <script src="js/js-qrcode.min.js"></script>
+    <link rel="stylesheet" href="css/css-style.css" type="text/css" />
+    <link rel="shortcut icon" href="favicons/images-favicon.ico" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <script type="text/javascript">
+      //IE&#47196; &#54252;&#53560; &#51217;&#44540;&#48520;&#44032;
+
+      var popupConSlider;
+
+      $(document).ready(function () {
+        if (
+          window.navigator.userAgent.match(/MSIE|Internet Explorer|Trident/i)
+        ) {
+          alert(
+            "Notice\x3A Incompatibility issues may occur with the Internet Explorer browser."
+          );
+        }
+
+        getOnelineNoticeData();
+
+        $("#cont_list").click(function () {
+          $(".popup_wrap").show();
+          popupConSlider.reloadSlider();
+          $("table.txc-wrapper tbody tr td").css("background-color", "#f7f8fb");
+          $("div.p_cont_area").css("height", "380px");
+        });
+
+        // &#54620;&#51460;&#44277;&#51648; &#54045;&#50629; &#44032;&#47532;&#44592;
+        $("#close").click(function () {
+          $(".popup_wrap").hide();
+        });
+
+        $("#user_id").focus();
+
+        checkId();
+
+        $("#saveIdIpt").click(function () {
+          if ($("#saveIdIpt").is(":checked") == true) {
+            alert(
+              "&#44277;&#44277;&#51109;&#49548;&#50640;&#49436;&#45716; &#50500;&#51060;&#46356;&#51200;&#51109; &#49436;&#48708;&#49828;&#47484; &#44428;&#51109;&#54616;&#51648; &#50506;&#49845;&#45768;&#45796;."
+            );
+          }
+        });
+
+        //&#45796;&#44397;&#50612;&#52376;&#47532;
+        $(".toggle_wrap ul li").click(function () {
+          var langType = $(this).attr("data-lt");
+          setCookie("default_locale", langType, 1);
+
+          window.location.reload();
+        });
+
+        initLangType();
+      });
+
+      function doLogin() {
+        if ($("#saveIdIpt").prop("checked")) {
+          saveId();
+        } else {
+          dontSaveId();
+        }
+
+        var userId = $("#user_id").val();
+        var password = $("#user_password").val();
+        if (userId == null || userId == "") {
+          alert("Enter your ID");
+        } else if (password == null || password == "") {
+          alert("Enter your password");
+          return;
+        } else {
+          $("#user_id").val($("#user_id").val().trim());
+
+          $("form[name=loginFrm]").attr("action", "/proc/Login.eps").submit();
+        }
+      }
+
+      function idFind() {
+        window.location = "/eXPortal/dku/jsp/login/idFind.jsp";
+      }
+
+      function pwdReset() {
+        window.location = "/eXPortal/dku/jsp/login/pwdReset.jsp";
+      }
+
+      function goQrcodeLogin() {
+        window.location = "/eXPortal/dku/jsp/login/qrCodeLogin.jsp";
+      }
+
+      function goParentService() {
+        window.location = "/eXPortal/dku/jsp/login/parentLogin.jsp";
+      }
+
+      function goSuburbLogin() {
+        window.location = "/eXPortal/dku/jsp/login/suburbLogin.jsp";
+      }
+
+      function doLoginEnter(e) {
+        var keynum;
+        if (window.event) {
+          // IE8 and earlier
+          keynum = e.keyCode;
+        } else if (e.which) {
+          // IE9/Firefox/Chrome/Opera/Safari
+          keynum = e.which;
+        }
+
+        if (keynum == 13) {
+          doLogin();
+        }
+      }
+
+      function doEnter(e) {
+        var keynum;
+
+        if (window.event) {
+          // IE8 and earlier
+          keynum = e.keyCode;
+        } else if (e.which) {
+          // IE9/Firefox/Chrome/Opera/Safari
+          keynum = e.which;
+        }
+        if (keynum == 13) {
+          $("#user_password").focus();
+        }
+      }
+
+      function getCookie(name) {
+        var nameOfCookie = name + "=";
+        var x = 0;
+        while (x <= document.cookie.length) {
+          var y = x + nameOfCookie.length;
+          if (document.cookie.substring(x, y) == nameOfCookie) {
+            if ((endOfCookie = document.cookie.indexOf(";", y)) == -1) {
+              endOfCookie = document.cookie.length;
+            }
+            return unescape(document.cookie.substring(y, endOfCookie));
+          }
+          x = document.cookie.indexOf(" ", x) + 1;
+          if (x == 0) break;
+        }
+        return "";
+      }
+
+      function setCookie(name, value, expireDate) {
+        var today = new Date();
+        today.setDate(today.getDate() + parseInt(expireDate));
+        document.cookie =
+          name +
+          "=" +
+          escape(value) +
+          ";path=/;expires=" +
+          today.toGMTString() +
+          ";";
+      }
+
+      function saveId() {
+        var cookieName = "loginId";
+        var id = $("#user_id").val();
+        setCookie(cookieName, id, 100);
+      }
+
+      function dontSaveId() {
+        var cookieName = "loginId";
+        setCookie(cookieName, "", -1);
+      }
+
+      function checkId() {
+        var cookieName = "loginId";
+        var value = getCookie(cookieName);
+        if (value != null && value.length != 0) {
+          $("#saveIdIpt").attr("checked", true);
+          $("#user_id").val(value);
+          $("#user_password").focus();
+        }
+      }
+
+      function getUserLonginLastTryTime() {
+        $.ajax({
+          type: "POST",
+          url: "/dku/LoginLastTryTime.eps",
+          data: {
+            user_id: "",
+          },
+          dataType: "json",
+          success: function (data) {
+            var time = data.time;
+            if (time == "" || time == null) {
+            } else {
+              alert(
+                "Your account has been temporarily locked for 5 minutes.\n Please reset your password if  login attempts continue to fail. \n( &#47196;&#44536;&#51064; &#44032;&#45733; &#49884;&#44036; " +
+                  time +
+                  " )"
+              );
+            }
+          },
+          error: function (error) {
+            console.log(error);
+          },
+        });
+      }
+
+      function getOnelineNoticeData() {
+        $.ajax({
+          type: "POST",
+          url: "/dku/OnelineNotice.eps",
+          dataType: "json",
+          success: function (data) {
+            var onelineNoticeList = data.onelineNoticeList;
+
+            if (onelineNoticeList != null && onelineNoticeList.length > 0) {
+              for (var i = 0; i < onelineNoticeList.length; i++) {
+                var title = onelineNoticeList[i].title;
+                var content = onelineNoticeList[i].content;
+                var id = onelineNoticeList[i].id;
+                var index = onelineNoticeList[i].inx;
+                var htmlTitle = "";
+
+                htmlTitle +=
+                  '<li class="onelineNotice"><a href="javascript:;" data-inx="' +
+                  index +
+                  '">' +
+                  title +
+                  "";
+
+                $("#cont_list ul").append(htmlTitle);
+              }
+              $(".notice_wrap").show();
+              $(".popup_wrap").show();
+            } else {
+              $(".notice_wrap").hide();
+              $(".popup_wrap").hide();
+            }
+            curNotiBxSlider();
+            setPopupConList(data);
+          },
+          error: function (error) {
+            console.log(error);
+          },
+        });
+      }
+
+      function curNotiBxSlider() {
+        var loginNotiSlider = $("#cont_list ul").bxSlider({
+          mode: "horizontal",
+          auto: true,
+          pause: 6000,
+          autoHover: false, // &#47560;&#50864;&#49828; &#50724;&#48260;&#49884; &#51221;&#51648;
+          pager: false, // &#54616;&#45800; &#54168;&#51060;&#51648; &#48260;&#53948;
+          controls: false, // prev, next &#48260;&#53948; &#45432;&#52636;
+          autoControls: false, // &#51116;&#49373;, &#51221;&#51648; &#48260;&#53948;
+          speed: 2000, // &#49836;&#46972;&#51060;&#46300; &#49660; &#49549;&#46020;
+          minSlides: 1, // &#52572;&#49548; &#49836;&#46972;&#51060;&#46300; &#49688;
+          maxSlides: 1, // &#52572;&#45824; &#49836;&#46972;&#51060;&#46300; &#49688;
+          moveSlides: 1, // &#51060;&#46041;&#54624; &#54168;&#51060;&#51648; &#49688;
+          captions: false, // &#53440;&#51060;&#53952;
+          touchEnabled: false,
+          infiniteLoop: true,
+        });
+      }
+
+      function setPopupConList(data) {
+        var htmlConTitle = "";
+        var htmlConContent = "";
+        var $popTit = $("#popup_title");
+        var $popCon = $("#popup_content");
+
+        var $pager = $(".paging_circle");
+        var pagerHtml = "";
+
+        var length = 0;
+
+        if (data != null) {
+          var list = data.onelineNoticeList;
+
+          for (var i = 0; i < list.length; i++) {
+            var index = list[i].inx;
+            pagerHtml +=
+              '<li class="bx-pager-item"><a class="bx-pager-link" data-slide-index="' +
+              i +
+              '" data-inx="' +
+              index +
+              '">';
+
+            var conTitle = list[i].title;
+            var conContent = list[i].content;
+            var index = list[i].inx;
+
+            htmlConContent += "<ul>";
+            htmlConContent +=
+              '<li data-inx="' +
+              index +
+              '"style="color: #000;margin-top: 5px;"><b>' +
+              conTitle +
+              "";
+            htmlConContent += '<li data-inx="' + index + '">' + conContent + "";
+            htmlConContent += "";
+          }
+        } else {
+          htmlConContent +=
+            '<li style="text-align: center;">&#51312;&#54924;&#46108; &#45936;&#51060;&#53552;&#44032; &#50630;&#49845;&#45768;&#45796;.';
+        }
+        $pager.empty();
+        $pager.html(pagerHtml);
+        $popCon.html(htmlConContent);
+
+        popupContentSlider();
+      }
+
+      function popupContentSlider() {
+        popupConSlider = $("#popup_content").bxSlider({
+          mode: "horizontal",
+          auto: false,
+          pause: 5000,
+          autoHover: false, // &#47560;&#50864;&#49828; &#50724;&#48260;&#49884; &#51221;&#51648;
+          pager: true, // &#54616;&#45800; &#54168;&#51060;&#51648; &#48260;&#53948;
+          controls: false, // prev, next &#48260;&#53948; &#45432;&#52636;
+          autoControls: false, // &#51116;&#49373;, &#51221;&#51648; &#48260;&#53948;
+          speed: 1000, // &#49836;&#46972;&#51060;&#46300; &#49660; &#49549;&#46020;
+          minSlides: 1, // &#52572;&#49548; &#49836;&#46972;&#51060;&#46300; &#49688;
+          maxSlides: 1, // &#52572;&#45824; &#49836;&#46972;&#51060;&#46300; &#49688;
+          moveSlides: 1, // &#51060;&#46041;&#54624; &#54168;&#51060;&#51648; &#49688;
+          pagerCustom: ".paging_circle", // &#54168;&#51060;&#51648;&#50752; &#48260;&#53948; &#50672;&#44228;
+          captions: false, // &#53440;&#51060;&#53952;
+          touchEnabled: false,
+          infiniteLoop: false,
+        });
+      }
+
+      //&#45796;&#44397;&#50612;&#49440;&#53469;
+      function initLangType() {
+        var type = getCookie("default_locale");
+
+        var lang = "undefined";
+        if (navigator.language != null) {
+          lang = navigator.language;
+        }
+
+        if (type == "en") {
+          $("#engType").addClass("t_active");
+          $("#engType div a").addClass("tog_active");
+
+          $("#korType").removeClass("t_active");
+          $("#korType div a").removeClass("tog_active");
+        } else if (type == "ko") {
+          $("#korType").addClass("t_active");
+          $("#korType div a").addClass("tog_active");
+
+          $("#engType").removeClass("t_active");
+          $("#engType div a").removeClass("tog_active");
+        } else {
+          if (lang == "ko" || lang == "ko-KR") {
+            $("#korType").addClass("t_active");
+            $("#korType div a").addClass("tog_active");
+
+            $("#engType").removeClass("t_active");
+            $("#engType div a").removeClass("tog_active");
+          } else if (lang == "en" || lang == "en-US") {
+            $("#engType").addClass("t_active");
+            $("#engType div a").addClass("tog_active");
+
+            $("#korType").removeClass("t_active");
+            $("#korType div a").removeClass("tog_active");
+          } else {
+            $("#korType").addClass("t_active");
+            $("#korType div a").addClass("tog_active");
+
+            $("#engType").removeClass("t_active");
+            $("#engType div a").removeClass("tog_active");
+          }
+        }
+      }
+
+      function doquickmenu_layer() {
+        if ($(".login_layer").css("display") === "none") {
+          $(".login_layer").css("display", "block");
+          $(".login_layer").show();
+          $(".dim").show();
+        } else {
+          $(".login_layer").hide();
+          $(".dim").hide();
+        }
+      }
+
+      function allSearchEnter() {
+        if (window.event.keyCode == 13) {
+          allSearch();
+        }
+      }
+
+      function allSearch() {
+        var keyword = $("#all_sch").val().trim();
+
+        var url =
+          "https\x3A\x2F\x2Fportal.dankook.ac.kr\x2Fsearch\x2Fsearch.do\x3Fcategory\x3DTOTAL\x26kwd\x3D" +
+          keyword;
+        window.open(url, "_blank");
+      }
+
+      function caps_lock(e) {
+        var keyCode = 0;
+        var shiftKey = false;
+        keyCode = e.keyCode;
+        shiftKey = e.shiftKey;
+        if (
+          (keyCode >= 65 && keyCode <= 90 && !shiftKey) ||
+          (keyCode >= 97 && keyCode <= 122 && shiftKey)
+        ) {
+          show_caps_lock();
+          setTimeout("hide_caps_lock()", 3500);
+        } else {
+          hide_caps_lock();
+        }
+      }
+
+      function show_caps_lock() {
+        $("#capslock").show();
+      }
+
+      function hide_caps_lock() {
+        $("#capslock").hide();
+      }
+
+      function mobileNaviAllSearchEnter() {
+        if (window.event.keyCode == 13) {
+          mobileNaviAllSearch();
+        }
+      }
+
+      function mobileNaviAllSearch() {
+        var keyword = $("#m_searchInput").val().trim();
+        var url =
+          "https\x3A\x2F\x2Fportal.dankook.ac.kr\x2Fsearch\x2Fsearch.do\x3Fcategory\x3DTOTAL\x26kwd\x3D" +
+          keyword;
+        window.open(url, "_blank");
+      }
+
+      /* &#47196;&#44536;&#51064; &#48148;&#47196;&#44032;&#44592; */
+      function goLoginPage() {
+        window.location = "/login.jsp";
+      }
+
+      function openGuide() {
+        window.open(
+          "/eXPortal/pdf/web/secondAuth/DeviceRegisteringGuide.pdf",
+          "_blank"
+        );
+      }
+
+      /* 2&#45800;&#44228; &#51064;&#51613; &#47196;&#44536;&#51064; functions */
+      function getViewOfInformFIDO() {
+        // &#44480;&#54616;&#45716; 2&#45800;&#44228; &#51064;&#51613; &#54596;&#49688;&#49324;&#50857; &#45824;&#49345;&#51088;&#51077;&#45768;&#45796;. View
+        var content = "";
+        content +=
+          '<div class="big_tit"><img src="/eXPortal/images/bul_squer.png" alt="&#48660;&#47551;&#50500;&#51060;&#53080;"/>';
+        content += "2 step certification service";
+        content += "";
+        content += '<div class="big_tit03 mt20">';
+        content +=
+          "You are \x3Cstrong\x3Ea required user of 2 step certification\x3C\x2Fstrong\x3E.\x3Cbr\x3EPlease\x26nbsp\x3B";
+        content += '<span class="btxt">';
+        content +=
+          "register the device after installing the Dankook University app.";
+        content += "";
+        content += "";
+        content += "";
+        content += '<div class="txt_center img_cer mt30">';
+        content +=
+          "<img src='/eXPortal/images/img_certification01.png' alt='register the device after installing the Dankook University app.'>";
+        content += "";
+        content += '<ul class="id_chk_list2 mt30">';
+        content += "<li>";
+        content +=
+          '<button class="btn_blue" type="button" onClick="javascript:goLoginPage();">';
+        content += "Login";
+        content += "";
+        content += "";
+        content += "<li>";
+        content +=
+          '<button class="btn_sky" type="button" onClick="javascript:openGuide()">';
+        content += "Guide - Device Registration";
+        content += "";
+        content += "";
+        content += "";
+        $(".info_area").html("");
+        $(".info_area").append(content);
+      }
+
+      var FIDOUserId, FIDOUserPw, FIDOAuthToken, FIDOTransactionId;
+      var tryCnt = 0;
+      var getResultOfFIDO;
+      var timerSetting;
+
+      function getViewOfCertifiedFIDO(FIDOvalues) {
+        userId = FIDOUserId = FIDOvalues.userId;
+        userPw = FIDOUserPw = FIDOvalues.userPw;
+        isMust = FIDOvalues.isMust;
+        authToken = FIDOAuthToken = FIDOvalues.authToken;
+        requestTime = FIDOvalues.requestTime;
+        transactionId = FIDOTransactionId = FIDOvalues.transactionId;
+
+        var content = "";
+        content +=
+          '<div class="big_tit"><img src="/eXPortal/images/bul_squer.png" alt="&#48660;&#47551;&#50500;&#51060;&#53080;"/>';
+        content += "2 step certification service";
+        content += "";
+        content += '<div class="big_tit03 mt10">';
+        content += "<strong>";
+        content += "2 step certification service User";
+        content += "";
+        content += "";
+        content += '<div class="time">';
+        content += "<span>";
+        content += "Timer";
+        content += '<span class="btxt" id="timer">';
+        content += "";
+        content += "";
+
+        content += "<span>";
+        content += "Number of attempts";
+        content += '<span class="btxt" id="counter">';
+        content += "<strong> ";
+        content += "0/5&#54924;";
+        content += "";
+        content += "";
+        content += "";
+
+        content += "";
+        content +=
+          "<div class='txt_center img_cer'><img src='/eXPortal/images/img_certification02.png' alt='Request 2 step certification service'>";
+        content += '<ul class="id_chk_list2 mt10">';
+        if (isMust) {
+          content +=
+            '<span style="text-align: center; margin-top: -5px;">You cannot turn off the feature as a 2 step certification service required user.';
+        }
+        content += "<li>";
+        content +=
+          '<button class="btn_blue" type="button" onClick="javascript:getResult()">Complete';
+        content += "";
+        content += "<li>";
+        content +=
+          '<button id="requestCertifiedMore" class="btn_sky" type="button" onClick="javascript:requestPush()">Rerequest <button id="setOffSecondAuthCertifiedBtn" class="btn_gray" type="button" onClick="javascript:getViewOfLiftCertifiedView()">Turn off';
+        content += "";
+        content += "";
+
+        content += '<form name="loginFrm" id="loginFrm" method="POST">';
+        content +=
+          '<input id="FIDO_success" name="FIDO_success" type="hidden" value="N">';
+        content += "";
+
+        $(".info_area").append(content);
+
+        var requestedTime = new Date(requestTime);
+        var currentTime = 300000;
+        var add5Minutes = new Date(requestedTime.getTime() + currentTime);
+
+        function updateTimer() {
+          var leftTime = add5Minutes - requestedTime;
+
+          var minutes = Math.floor(leftTime / 60000);
+          var seconds = Math.floor((leftTime % 60000) / 1000);
+
+          if (minutes <= 0 && seconds <= 0) {
+            clearInterval(timerSetting);
+            $("#timer").html("<strong> 00&#48516; 00&#52488;" + "");
+            alert(
+              "&#51064;&#51613; &#50976;&#54952; &#49884;&#44036;&#51060; &#51648;&#45228;&#49845;&#45768;&#45796;."
+            );
+            goLoginPage();
+          } else {
+            if ((minutes + "").length == 1) {
+              minutes = "0" + minutes;
+            }
+            if ((seconds + "").length == 1) {
+              seconds = "0" + seconds;
+            }
+            $("#timer").html(
+              "<strong> " + minutes + "&#48516; " + seconds + "&#52488;" + ""
+            );
+          }
+        }
+
+        updateTimer();
+
+        timerSetting = setInterval(function () {
+          requestedTime = new Date(requestedTime.getTime() + 1000);
+          updateTimer();
+        }, 1000); // &#53440;&#51060;&#47672; &#49884;&#51089;
+
+        setTimeout(function () {}, 300000); // 5&#48516;
+
+        if (isMust) {
+          $("#setOffSecondAuthCertifiedBtn")
+            .prop("disabled", true)
+            .css("backgroundColor", "#ccc");
+        }
+      }
+
+      function getViewOfLiftCertifiedView() {
+        // 2&#52264; &#51064;&#51613; &#54644;&#51228; View
+        clearInterval(timerSetting);
+
+        var PHstudentId = "&#54617;&#48264;/&#44368;&#48264;";
+        var PHuserName = "&#51060;&#47492;";
+        var PHuserPhone =
+          "&#55092;&#45824;&#54256;&#48264;&#54840; (&#49707;&#51088;&#47564; &#51077;&#47141;)";
+        var PHuserBirth = "&#49373;&#45380;&#50900;&#51068; (yyyymmdd)";
+        var PHuserReason =
+          "&#49324;&#50976; (5&#51088; &#51060;&#49345; &#51077;&#47141;)";
+
+        var content = "";
+        content +=
+          '<div class="big_tit"><img src="/eXPortal/images/bul_squer.png" alt="&#48660;&#47551;&#50500;&#51060;&#53080;"/>';
+        content += "2 step certification service";
+        content += "";
+        content += '<div class="big_tit02">';
+        content += "If you want to trun off 2 step certification service Click";
+        content += ' <span class="btxt">Turn off';
+        content += "Button.";
+        content += '<div class="join_form03">';
+        content += '<div class="l_form secondAuth_l_form">';
+        content += '<div class="row_group02">';
+
+        content += '<label for="student_id">';
+        content +=
+          '<input class="join_row mt10" id="student_id" type="text" placeholder="' +
+          PHstudentId +
+          '">';
+        content += '<label for="cer_name">';
+        content +=
+          '<input class="join_row mt10" id="cer_name" type="text" placeholder="' +
+          PHuserName +
+          '">';
+        content += '<label for="cer_phone">';
+        content +=
+          '<input class="join_row mt10" id="cer_phone" type="text" placeholder="' +
+          PHuserPhone +
+          '">';
+        content += '<label for="cer_birthdate">';
+        content +=
+          '<input class="join_row mt10" id="cer_birthdate" type="text" placeholder="' +
+          PHuserBirth +
+          '">';
+        content += '<label for="cer_reason">';
+        content +=
+          '<input class="join_row mt10" id="cer_reason" type="text" placeholder="' +
+          PHuserReason +
+          '">';
+
+        content += "";
+        content += "";
+        content += "";
+        content += '<ul class="id_chk_list3 mt20">';
+        content += "<li>";
+        content +=
+          '<button class="btn_blue" type="button" onClick="javascript:liftSecondAuth()">Turn off';
+        content += "";
+        content += "";
+
+        $(".info_area").html("");
+        $(".info_area").append(content);
+      }
+
+      function getViewOfSuccessLiftSecondAuth() {
+        var content = "";
+        content +=
+          '<div class="big_tit"><img src="/eXPortal/images/bul_squer.png" alt="&#48660;&#47551;&#50500;&#51060;&#53080;"/>';
+        content += "2 step certification service";
+        content += "";
+        content += '<div class="big_tit03 mt20">';
+        content +=
+          "<strong>Turning off 2 step certification service has been completed.<br>";
+        content +=
+          '<span class="btxt">If you want to turn on 2 step certification service, you can try in \x5BPortal \x3E My page \x3E 2\uB2E8\uACC4 \uC778\uC99D \uC124\uC815\x5D\x3Cbr\x3ETry log in again.';
+        content += "";
+        content +=
+          '<div class="txt_center img_cer mt30"><img src="/eXPortal/images/img_certification03.png" alt="Turn off">';
+        content += '<ul class="id_chk_list2 mt20">';
+        content += "<li>";
+        content +=
+          '<button class="btn_blue" type="button" onClick="javascript:goLoginPage()">Confirm';
+        content += "";
+        content += "";
+
+        $(".info_area").html("");
+        $(".info_area").append(content);
+      }
+
+      function getResult() {
+        getFIDOResult();
+      }
+
+      function getFIDOResult() {
+        tryCnt += 1;
+        if (tryCnt < 6) {
+          $("#counter").html("<strong> " + tryCnt + "/5&#54924;");
+          $.ajax({
+            // 3&#52264; 2&#45800;&#44228; &#51064;&#51613; &#44208;&#44284; &#44032;&#51256;&#50724;&#44592;
+            url: "/dku/SecondAuthFIDOResult.eps",
+            type: "POST",
+            dataType: "JSON",
+            data: {
+              userId: FIDOUserId,
+              authToken: FIDOAuthToken,
+              transactionId: FIDOTransactionId,
+            },
+            success: function (data) {
+              if (data.result) {
+                $("#FIDO_success").val("Y");
+
+                var content = "";
+                content +=
+                  '<input id="user_id" name="user_id" type="hidden" value="' +
+                  FIDOUserId +
+                  '">';
+                content +=
+                  '<input id="user_password" name="user_password" type="hidden" value="' +
+                  FIDOUserPw +
+                  '">';
+                content +=
+                  '<input type="hidden" name="auto_login" id="auto_login" value="N">';
+
+                $("#loginFrm").append(content);
+                $("form[name=loginFrm]")
+                  .attr("action", "/proc/Login.eps")
+                  .submit();
+              } else {
+                if (data.errorCode == "400000") {
+                  alert(
+                    "&#51064;&#51613;&#51060; &#50756;&#47308;&#46104;&#51648; &#50506;&#50520;&#49845;&#45768;&#45796;.\n&#51064;&#51613;&#51012; &#50756;&#47308;&#54620; &#54980; &#45796;&#49884; &#49884;&#46020;&#54644;&#51452;&#49464;&#50836;."
+                  );
+                } else if (data.errorCode == "300000") {
+                  alert(
+                    "&#51064;&#51613;&#51012; &#49892;&#54056;&#54616;&#50688;&#49845;&#45768;&#45796;."
+                  );
+                  goLoginPage();
+                } else {
+                  alert(
+                    "&#50724;&#47448;&#44032; &#48156;&#49373;&#54616;&#50688;&#49845;&#45768;&#45796;."
+                  );
+                  goLoginPage();
+                }
+              }
+            },
+            error: function (error) {
+              console.log(error);
+            },
+          });
+        } else {
+          clearInterval(timerSetting);
+          $("#timer").html("<strong> 00&#48516; 00&#52488;" + "");
+          alert(
+            "&#51064;&#51613;&#54869;&#51064; &#49884;&#46020; &#54943;&#49688;&#47484; &#52488;&#44284;&#54616;&#50688;&#49845;&#45768;&#45796;.\n[&#51116;&#50836;&#52397;] &#48260;&#53948;&#51012; &#51060;&#50857;&#54616;&#50668; &#51116;&#50836;&#52397;&#54616;&#49884;&#44592; &#48148;&#46989;&#45768;&#45796;."
+          );
+        }
+      }
+
+      function getPush(userId, userPw) {
+        var content = "";
+        content +=
+          '<input id="user_id" name="user_id" type="hidden" value="' +
+          userId +
+          '">';
+        content +=
+          '<input id="user_password" name="user_password" type="hidden" value="' +
+          userPw +
+          '">';
+        content +=
+          '<input type="hidden" name="auto_login" id="auto_login" value="N">';
+
+        $("#loginFrm").append(content);
+        $("form[name=loginFrm]").attr("action", "/proc/Login.eps").submit();
+      }
+
+      function requestPush() {
+        getPush(FIDOUserId, FIDOUserPw);
+      }
+
+      function liftSecondAuth() {
+        var userId = $("#student_id").val().trim();
+        var userName = $("#cer_name").val().trim();
+        var userPhone = $("#cer_phone").val().trim();
+        var userBirth = $("#cer_birthdate").val().trim();
+        var userReason = $("#cer_reason").val().trim();
+
+        if (
+          userId != "" &&
+          userName != "" &&
+          userPhone != "" &&
+          userBirth != "" &&
+          userReason != "" &&
+          userReason.length >= 5
+        ) {
+          $.ajax({
+            // 2&#45800;&#44228; &#51064;&#51613; &#54644;&#51228; &#54616;&#44592;
+            url: "/dku/LiftSecondAuth.eps",
+            type: "POST",
+            dataType: "JSON",
+            data: {
+              userId: userId,
+              userName: userName,
+              userPhone: userPhone,
+              userBirth: userBirth,
+              userReason: userReason,
+            },
+            success: function (data) {
+              if (data.result) {
+                getViewOfSuccessLiftSecondAuth();
+              } else {
+                alert(
+                  "2&#45800;&#44228; &#51064;&#51613; &#54644;&#51228;&#47484; &#49892;&#54056;&#54664;&#49845;&#45768;&#45796;. &#51221;&#48372;&#47484; &#54869;&#51064;&#54644;&#51452;&#49464;&#50836;."
+                );
+              }
+            },
+            error: function (error) {
+              console.log(error);
+            },
+          });
+        } else {
+          if (userId == "") {
+            alert(
+              "&#50500;&#51060;&#46356;&#47484; &#51077;&#47141;&#54644;&#51452;&#49464;&#50836;."
+            );
+            return;
+          }
+          if (userName == "") {
+            alert(
+              "&#51060;&#47492;&#51012; &#51077;&#47141;&#54644;&#51452;&#49464;&#50836;."
+            );
+            return;
+          }
+          if (userPhone == "") {
+            alert(
+              "&#55092;&#45824;&#54256;&#48264;&#54840;&#47484; &#51077;&#47141;&#54644;&#51452;&#49464;&#50836;."
+            );
+            return;
+          }
+          if (userBirth == "") {
+            alert(
+              "&#49373;&#45380;&#50900;&#51068;&#51012; &#51077;&#47141;&#54644;&#51452;&#49464;&#50836;."
+            );
+            return;
+          }
+          if (userReason == "" || userReason.length < 5) {
+            alert(
+              "&#49324;&#50976;&#47484; &#51077;&#47141;&#54644;&#51452;&#49464;&#50836; (5&#51088; &#51060;&#49345;)"
+            );
+            return;
+          }
+        }
+      }
+
+      function dateFormat(date) {
+        var amOrPm =
+          date.getHours() >= 12 ? "&#50724;&#54980;" : "&#50724;&#51204;";
+
+        var year = date.getFullYear();
+        var month = String(date.getMonth() + 1).padStart(2, "0");
+        var day = String(date.getDate()).padStart(2, "0");
+        var hours = date.getHours() % 12 || 12;
+        var minutes = String(date.getMinutes()).padStart(2, "0");
+        var seconds = String(date.getSeconds()).padStart(2, "0");
+        if (minutes.length == 1) {
+          minutes = "0" + minutes;
+        }
+        if (seconds.length == 1) {
+          seconds = "0" + seconds;
+        }
+
+        var formattedDate =
+          amOrPm +
+          " " +
+          hours +
+          "&#49884; " +
+          minutes +
+          "&#48516; " +
+          seconds +
+          "&#52488;";
+        return formattedDate;
+      }
+    </script>
+  </head>
+  <body class="bg_color01">
+    <!-- login_wrap S -->
+    <div class="login_wrap">
+      <div id="skipnavi">
+        <h1>Dankook University SSO Login</h1>
+        <a href="#form_id">Go to login page</a>
+      </div>
+      <!-- header_wrap S -->
+      <div class="header_wrap">
+        <div class="top_area">
+          <ul>
+            <li id="logo_login">
+              <a href="portal.dankook.ac.html"
+                ><img
+                  src="images/login-login_logo.png"
+                  alt="Dankook University SSO Login"
+              /></a>
+            </li>
+            <li>
+              <div class="sch_wrap">
+                <span class="sch_font01">통합검색</span>
+                <label for="all_sch"></label>
+                <input
+                  type="text"
+                  class="sch_st01"
+                  id="all_sch"
+                  onkeyup="javascript:allSearchEnter();"
+                  placeholder="검색어를 입력해주세요"
+                />
+                <span class="btn_sch" onclick="javascript:allSearch();"
+                  ><img src="images/login-ico_sch.png" alt="Search Button"
+                /></span>
+              </div>
+              <!-- KOR &#49440;&#53469; &#49884; /-->
+              <div class="toggle_wrap">
+                <ul>
+                  <li class="t_active" id="korType" data-lt="ko">
+                    <div>
+                      <a class="tog_active" href="javascript:;.html">KOR</a>
+                    </div>
+                  </li>
+                  <li id="engType" data-lt="en">
+                    <div><a href="javascript:;.html">ENG</a></div>
+                  </li>
+                </ul>
+              </div>
+              <!-- ENG &#49440;&#53469; &#49884; /-->
+              <!--                          <div class="toggle_wrap"> -->
+              <!--                             <ul> -->
+              <!--                                 <li> -->
+
+              <!--                                 </li> -->
+              <!--                                 <li class="t_active" > -->
+
+              <!--                                 </li> -->
+              <!--                             </ul> -->
+              <!--                         </div> -->
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- header_wrap E /-->
+      <!-- login_container S -->
+      <div class="login_container">
+        <!-- dankook_contanier S -->
+        <div class="dankook_contanier">
+          <!-- content_area S -->
+          <div class="content_area">
+            <title>단국대학교 통합 로그인</title>
+            <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+            <meta http-equiv="Pragma" content="no-cache" />
+            <meta http-equiv="Cache-Control" content="no-cache" />
+            <meta
+              name="viewport"
+              content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0"
+            />
+            <meta
+              name="author"
+              content="포털시스템,단국대학교,통합로그인,로그인"
+            />
+            <script type="text/javascript" src="js/js-jquery.min.js"></script>
+            <script src="js/js-jquery-1.7.2.min.js"></script>
+            <script src="js/js-jquery.bxslider.js"></script>
+            <link rel="stylesheet" href="css/css-style.css" type="text/css" />
+            <meta
+              http-equiv="Content-Type"
+              content="text/html; charset=utf-8"
+            />
+
+            <script type="text/javascript">
+              $(document).ready(function () {});
+
+              function doquickmenu_layer() {
+                if ($(".login_layer").css("display") === "none") {
+                  $(".login_layer").css("display", "block");
+                  $(".login_layer").show();
+                  $(".dim").show();
+                } else {
+                  $(".login_layer").hide();
+                  $(".dim").hide();
+                }
+              }
+            </script>
+
+            <div class="login_guide">
+              <span>
+                <a
+                  onclick="javascript:doquickmenu_layer();"
+                  style="cursor: pointer"
+                  href="S01.html"
+                >
+                  단국대학교 로그인 안내<img
+                    src="images/login-ico_help.png"
+                    alt="Dankook University Login Guide"
+                  />
+                </a>
+              </span>
+            </div>
+
+            <div class="login_layer" style="display: none">
+              <div>
+                <dl>
+                  <dt class="login_layer_title">단국대학교 로그인 안내</dt>
+                  <dd class="login_layer_cont">
+                    <dl>
+                      <dt class="bul_type_01">
+                        <strong>단국인 로그인 안내</strong>
+                      </dt>
+                      <dd>
+                        <br />
+                        <div class="login_text_box">
+                          <b>아 이 디 :</b> 학생 / 교번<br />
+                          <b>패스워드 :</b> 통합로그인 패스워드<br />
+                          <br />
+                          1. 최초 비밀번호는 주민등록번호 앞 10자리입니다.<br />
+                          2. 최초 비밀번호는 로그인 후 반드시 변경하여야하며,
+                          변경 후 서비스를 이용하실 수 있습니다. <br /><br />
+                          <a
+                            class="personal_info"
+                            href="https://www.dankook.ac.kr/web/kor/privacy"
+                            target="_blank"
+                          >
+                            <b>* 개인정보 처리방침</b>
+                          </a>
+                        </div>
+                        <br />
+                        <br />
+                      </dd>
+                      <dt class="bul_type_01">
+                        <strong>교외사용자 로그인 안내</strong>
+                      </dt>
+                      <dd>
+                        <br />
+                        <div class="login_text_box">
+                          <br />
+                          일반인이 채용 지원 및 부속/부설기관의 서비스를
+                          이용하기 위하여 교외사용자로 회원가입할 수
+                          있습니다.<br />
+                          가입시 기입한 이메일 주소가 아이디이며 입력한
+                          비밀번호로 로그인이 가능합니다.<br />
+                          <br />
+                          <b>교외사용자 사용가능 서비스</b><br /><br />
+                          채용, 구매/입찰, 발전기금, 평생교육원,
+                          사범대학부설교육연수원, 한국어교사양성과정,
+                          한국어교육과정, 국외대학생 교류프로그램<br /><br />
+                          <b>교외사용자의 개인정보 수집 및 활용</b><br /><br />
+                           1. 수집목적 : 채용지원 및 부속/부설기관의 서비스 이용
+                          등<br />
+                           2. 수집항목 : 이메일 주소, 성명<br />
+                           3. 보유 및 보유기간 : 가입(동의)시부터 2년<br />
+                           4. 가입 후 2년 이내에 재동의 시 서비스 연장<br />
+                           5. 수집되는 정보는 권한확인 이외에 다른 목적으로는
+                          사용하지 않습니다.<br />
+                        </div>
+                      </dd>
+                    </dl>
+                  </dd>
+                </dl>
+              </div>
+              <span class="login_layer_close"
+                ><img
+                  src="images/images-ico_close_pop.png"
+                  alt="닫기버튼"
+                  onclick="javascript:doquickmenu_layer();"
+              /></span>
+            </div>
+            <div class="dim" style="display: none"></div>
+
+            <!-- login_cont_wrap S -->
+            <div class="login_cont_wrap">
+              <!-- &#47784;&#48148;&#51068; &#44160;&#49353;&#52285; -->
+
+              <!-- login_all_box S -->
+              <div class="login_all_box">
+                <div class="login_tit_wrap">
+                  <div class="tit_wrap">
+                    <ul>
+                      <li>
+                        <a href="javascript:goLoginPage().html"
+                          ><img
+                            src="images/login-ico_login_logo.png"
+                            alt="Login Logo"
+                        /></a>
+                      </li>
+                      <li>
+                        <span
+                          >단국대학교 포털 서비스를 이용하시려면 로그인이
+                          필요합니다.</span
+                        >
+                        <span
+                          >서비스 이용 후 반드시 로그아웃 하시기 바랍니다.</span
+                        >
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="notice_wrap"></div>
+                </div>
+              </div>
+              <!-- login_all_box E /-->
+
+              <!-- login_form_area S -->
+              <div class="login_form_area">
+                <div class="info_area">
+                  <!-- form_area S -->
+                  <div class="form_area">
+                    <fieldset>
+                      <legend>Login</legend>
+                      <form
+                        name="loginFrm"
+                        id="loginFrm"
+                        method="POST"
+                        action="/result"
+                      >
+                        <div class="l_form">
+                          <div class="row_group">
+                            <label for="user_id"></label>
+                            <input
+                              class="join_row ico_01"
+                              id="user_id"
+                              name="user_id"
+                              type="text"
+                              autocomplete="off"
+                              placeholder="학번/교직원번호"
+                              maxlength="8"
+                            />
+                            <label for="user_password"></label>
+                            <input
+                              class="join_row mt10 ico_02"
+                              id="user_password"
+                              name="user_password"
+                              autocomplete="off"
+                              type="password"
+                              onkeypress="caps_lock(event)"
+                              placeholder="비밀번호"
+                              onkeydown="javascript:doLoginEnter(event)"
+                            />
+                            <p
+                              id="capslock"
+                              style="
+                                position: relative;
+                                width: 300px;
+                                bottom: 0px;
+                                display: none;
+                                font-weight: bold;
+                              "
+                            >
+                              <b>CapsLock key is pressed.</b>
+                            </p>
+                            <input
+                              type="hidden"
+                              name="auto_login"
+                              id="auto_login"
+                              value="N"
+                            />
+                            <input
+                              type="hidden"
+                              name="returnurl"
+                              id="returnurl"
+                              value="https://portal.dankook.ac.kr"
+                            />
+                          </div>
+                          <div
+                            id="login_error_message"
+                            style="display: none"
+                          ></div>
+                        </div>
+                        <div class="option_area">
+                          <ul>
+                            <li tabindex="0">
+                              <input type="checkbox" id="saveIdIpt" />
+                              <label for="saveIdIpt"></label>
+                              <span class="id_font02">아이디저장</span>
+                            </li>
+                            <li>
+                              <span class="id_font01">
+                                <a onclick="idFind();" href="S01.html">
+                                  <img
+                                    src="images/login-ico_option_arrow.png"
+                                    alt="Arrow icon"
+                                  />
+                                  아이디찾기
+                                </a>
+                              </span>
+                              <span class="id_font01">
+                                <!-- &#48708;&#48128;&#48264;&#54840; &#52286;&#44592; -->
+                                <a onclick="pwdReset();" href="S01.html">
+                                  <img
+                                    src="images/login-ico_option_arrow.png"
+                                    alt="Arrow icon"
+                                  />
+                                  비밀번호 재설정
+                                </a>
+                              </span>
+                            </li>
+                          </ul>
+                        </div>
+                        <div class="option_area_down">
+                          <ul>
+                            <li>
+                              <span class="id_font01">
+                                <a
+                                  href="http://sugang.dankook.ac.kr/findId.do"
+                                  target="_blank"
+                                >
+                                  <img
+                                    src="images/login-ico_option_arrow.png"
+                                    alt="Arrow icon"
+                                  />
+                                  신/편입생 학번조회
+                                </a>
+                              </span>
+                            </li>
+                          </ul>
+                        </div>
+                        <div class="login_btn">
+                          <button type="submit">로그인</button>
+                        </div>
+                      </form>
+                    </fieldset>
+                  </div>
+                  <!-- form_area E /-->
+                  <div class="icon_menu_area">
+                    <ul>
+                      <!--                                         <li>  style.css 171 &#46972;&#51064; &#49688;&#51221;-->
+                      <!--                                             <a onclick="goQrcodeLogin();" id="qr_login"> -->
+
+                      <!--                                             </a> -->
+                      <!--                                         </li> -->
+                      <li>
+                        <a onclick="goParentService();" href="S01.html">
+                          <img
+                            src="images/login-ico_menu02.png"
+                            alt="Services for Parents"
+                          />
+                          <span>학부모 서비스</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="javascript:goSuburbLogin();.html">
+                          <img
+                            src="images/login-ico_menu04.png"
+                            alt="E-mail account login"
+                          />
+                          <span>교외로그인</span>
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="cal_area">
+                  <!-- layer_popup S -->
+                  <div class="popup_wrap" id="">
+                    <div class="p_tit_area">
+                      <ul id="popup_title">
+                        <li>Notice</li>
+                        <li id="close">
+                          <img src="images/login-ico_close.png" alt="Close" />
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="p_cont_area">
+                      <div class="popup_cont" id="popup_content"></div>
+                    </div>
+                    <div class="pagi_wrap">
+                      <ul class="paging_circle"></ul>
+                    </div>
+                  </div>
+                  <!-- layer_popup E /-->
+
+                  <!-- DKU NEWS S -->
+
+                  <title>단국대학교 통합 로그인</title>
+                  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+                  <meta http-equiv="Pragma" content="no-cache" />
+                  <meta http-equiv="Cache-Control" content="no-cache" />
+                  <meta
+                    name="viewport"
+                    content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0"
+                  />
+                  <meta
+                    name="author"
+                    content="포털시스템,단국대학교,통합로그인,로그인"
+                  />
+                  <script
+                    type="text/javascript"
+                    src="js/js-jquery.min.js"
+                  ></script>
+                  <script src="js/js-jquery-1.7.2.min.js"></script>
+                  <script src="js/js-jquery.bxslider.js"></script>
+                  <link
+                    rel="stylesheet"
+                    href="css/css-style.css"
+                    type="text/css"
+                  />
+                  <meta
+                    http-equiv="Content-Type"
+                    content="text/html; charset=utf-8"
+                  />
+
+                  <script type="text/javascript">
+                    $(document).ready(function () {
+                      getDataShowYn();
+                    });
+
+                    function getDataShowYn() {
+                      $.ajax({
+                        type: "POST",
+                        url: "/dku/DataShowYn.eps",
+                        dataType: "json",
+                        success: function (data) {
+                          var getDataShowY = data.getDataShowY;
+
+                          if (!!getDataShowY) {
+                            if (getDataShowY == "Y") {
+                              getDkuNews();
+                            } else {
+                              var htmlNews = "";
+
+                              htmlNews += "	<li>";
+                              htmlNews += "		<dl>";
+                              htmlNews += "			<dt>";
+                              htmlNews += '				<ul class="list_item">';
+                              htmlNews +=
+                                "					<li><a>&#46321;&#47197;&#46108; NEWS&#44032; &#50630;&#49845;&#45768;&#45796;.";
+                              htmlNews += "					<li>";
+                              htmlNews += "				";
+                              htmlNews += "			";
+                              htmlNews += "		";
+                              htmlNews += "	";
+
+                              $("#dku_cal_list").append(htmlNews);
+                            }
+                          }
+                        },
+                        error: function (error) {
+                          console.log(error);
+                        },
+                      });
+                    }
+
+                    function getDkuNews() {
+                      $.ajax({
+                        type: "POST",
+                        url: "/dku/DkuNews.eps",
+                        dataType: "json",
+                        success: function (data) {
+                          var dkuNewsList = data.dkuNewsList;
+
+                          if (dkuNewsList != null && dkuNewsList.length > 0) {
+                            for (var i = 0; i < dkuNewsList.length; i++) {
+                              var title = dkuNewsList[i].title;
+                              var cn = dkuNewsList[i].cn;
+                              var stickyEndDate = dkuNewsList[i].stickyenddate;
+                              var urlLink = dkuNewsList[i].urllink;
+
+                              var htmlNews = "";
+
+                              htmlNews += "	<li>";
+                              htmlNews += "		<dl>";
+                              htmlNews += "			<dt>";
+                              htmlNews += '				<ul class="list_item">';
+                              htmlNews +=
+                                '					<li><a href="' +
+                                urlLink +
+                                '" target="_blank">' +
+                                title +
+                                "";
+                              htmlNews += "					<li>" + stickyEndDate + "";
+                              htmlNews += "				";
+                              htmlNews += "			";
+                              htmlNews +=
+                                '			<dd><a href="' +
+                                urlLink +
+                                '" target="_blank">' +
+                                cn +
+                                "";
+                              htmlNews += "		";
+                              htmlNews += "	";
+
+                              $("#dku_cal_list").append(htmlNews);
+                            }
+                          } else {
+                            var htmlNews = "";
+
+                            htmlNews += "	<li>";
+                            htmlNews += "		<dl>";
+                            htmlNews += "			<dt>";
+                            htmlNews += '				<ul class="list_item">';
+                            htmlNews +=
+                              "					<li><a>&#46321;&#47197;&#46108; NEWS&#44032; &#50630;&#49845;&#45768;&#45796;.";
+                            htmlNews += "					<li>";
+                            htmlNews += "				";
+                            htmlNews += "			";
+                            htmlNews += "		";
+                            htmlNews += "	";
+
+                            $("#dku_cal_list").append(htmlNews);
+                          }
+                        },
+                        error: function (error) {
+                          console.log(error);
+                        },
+                      });
+                    }
+                  </script>
+
+                  <div class="cal_tit_area">
+                    <img
+                      src="images/login-ico_news.png"
+                      alt="DKU 공지사항 아이콘"
+                    />
+                    <span class="tit_st01"
+                      >DKU <span class="tit_st02">NEWS</span></span
+                    >
+                    <div class="cal_list">
+                      <ul id="dku_cal_list">
+                        <li>
+                          <dl>
+                            <dt>
+                              <ul class="list_item">
+                                <li>
+                                  <a
+                                    href="https://www.dankook.ac.kr/web/kor/-550?p_p_id=Bbs_WAR_bbsportlet&amp;p_p_lifecycle=0&amp;p_p_state=normal&amp;p_p_mode=view&amp;_Bbs_WAR_bbsportlet_action=view_message&amp;_Bbs_WAR_bbsportlet_messageId=778284"
+                                    target="_blank"
+                                    >‘청년 잡페어(Job Fair)’ 용인특례시와 공동
+                                    개최</a
+                                  >
+                                </li>
+                                <li>2023.11.09</li>
+                              </ul>
+                            </dt>
+                            <dd>
+                              <a
+                                href="https://www.dankook.ac.kr/web/kor/-550?p_p_id=Bbs_WAR_bbsportlet&amp;p_p_lifecycle=0&amp;p_p_state=normal&amp;p_p_mode=view&amp;_Bbs_WAR_bbsportlet_action=view_message&amp;_Bbs_WAR_bbsportlet_messageId=778284"
+                                target="_blank"
+                                >취창업지원처 대학일자리플러스센터가 8일
+                                죽전캠퍼스 체육관에서 용인특례시와 공동으로
+                                하반기 일자리 박람회 청년 잡페어(Job Fair)를
+                                개최했다. 이날 행사에는 구직자 600여명이 몰리며
+                                성황을 이뤘다. 행사에는 안순철 총장, 류광열
+                                용인특례시 제1부시장, 김오영 교학부총장, 민동원
+                                취창업지원처장, 이기옥 용인시 일자리산업국장
+                                등이 참석했다. △대학과 용인특례시 관계자들이
+                                박람회장에서 기념사진을 촬영하고 있다.
+                                박람회에서는 관내 9개 대학연합협의회가 공동으로
+                                취업준비생들에게 일자리 정보를 제공하고 이력서
+                                작성법과 구직 상담을 진행했다. △학생들이
+                                채용정보를 확인하고 있다. △학생들이 기업담당자와
+                                상담 중이다. 현장 참여 기업은 △캐리어에어컨
+                                △다원시스 △주성엔지니어링 △LIG시스템 △나노텍
+                                △선인 등 관내 60개 기업이다. 구직자는 이력서와
+                                자기소개서를 가지고 박람회장에서 바로 면접을
+                                진행했다.</a
+                              >
+                            </dd>
+                          </dl>
+                        </li>
+                        <li>
+                          <dl>
+                            <dt>
+                              <ul class="list_item">
+                                <li>
+                                  <a
+                                    href="https://www.dankook.ac.kr/web/kor/-550?p_p_id=Bbs_WAR_bbsportlet&amp;p_p_lifecycle=0&amp;p_p_state=normal&amp;p_p_mode=view&amp;_Bbs_WAR_bbsportlet_action=view_message&amp;_Bbs_WAR_bbsportlet_messageId=778132"
+                                    target="_blank"
+                                    >발전기금 1억 원 기탁, 'K-뷰티 선도인재
+                                    양성'</a
+                                  >
+                                </li>
+                                <li>2023.11.07</li>
+                              </ul>
+                            </dt>
+                            <dd>
+                              <a
+                                href="https://www.dankook.ac.kr/web/kor/-550?p_p_id=Bbs_WAR_bbsportlet&amp;p_p_lifecycle=0&amp;p_p_state=normal&amp;p_p_mode=view&amp;_Bbs_WAR_bbsportlet_action=view_message&amp;_Bbs_WAR_bbsportlet_messageId=778132"
+                                target="_blank"
+                                >K-뷰티를 선도하고 있는 글로벌 화장품 전문기업
+                                ㈜한솔바이오텍(대표이사 임승호)과
+                                한솔생명과학(주)(대표이사 신형석)이 인재양성에
+                                써달라며 우리 대학에 각각 5천만원씩 총 1억원을
+                                기탁했다. ㈜한솔바이오텍은 글로벌 기준에
+                                부합하는 최상의 품질 및 안정성을 갖춘 화장품을
+                                연구생산하는데 주력하고 있다. 특히 높은
+                                기술력으로 고효능 기능성 화장품 및 의약외품
+                                개발에도 매진하고 있다. △ (주)한솔바이오텍
+                                임승호 대표이사가 안순철 총장(오른쪽)에게
+                                발전기금을 전달했다. 임승호 대표이사는 스타트업
+                                시절 많은 분의 도움 덕에 지금의 기업을 키울 수
+                                있었다라며 선한 영향력으로 학생들의 꿈과 열정을
+                                응원하고 싶다라며 기탁 사유를 밝혔다.
+                                한솔생명과학(주)은 화장품 RD 특화기업으로 우수한
+                                기술력을 바탕으로 국내 화장품 시장을 선도하고
+                                있다. 또한 산학&amp;m</a
+                              >
+                            </dd>
+                          </dl>
+                        </li>
+                        <li>
+                          <dl>
+                            <dt>
+                              <ul class="list_item">
+                                <li>
+                                  <a
+                                    href="https://www.dankook.ac.kr/web/kor/-550?p_p_id=Bbs_WAR_bbsportlet&amp;p_p_lifecycle=0&amp;p_p_state=normal&amp;p_p_mode=view&amp;_Bbs_WAR_bbsportlet_action=view_message&amp;_Bbs_WAR_bbsportlet_messageId=778101"
+                                    target="_blank"
+                                    >국가고객만족도(NCSI), 국내 4년제 대학
+                                    4위</a
+                                  >
+                                </li>
+                                <li>2023.11.06</li>
+                              </ul>
+                            </dt>
+                            <dd>
+                              <a
+                                href="https://www.dankook.ac.kr/web/kor/-550?p_p_id=Bbs_WAR_bbsportlet&amp;p_p_lifecycle=0&amp;p_p_state=normal&amp;p_p_mode=view&amp;_Bbs_WAR_bbsportlet_action=view_message&amp;_Bbs_WAR_bbsportlet_messageId=778101"
+                                target="_blank"
+                                >우리 대학이 한국생산성본부 선정
+                                국가고객만족도(NCSI)에서 국내 4년제 대학 중
+                                4위에 이름을 올렸다. 우리 대학은 올해 처음으로
+                                참여해 실시한 NCSI 만족도 조사에서 79점을 기록,
+                                성균관대(1위), 이화여대한국외대(공동 2위)에 이어
+                                4위를 차지했다. 이번 만족도 조사는 전국 4년제
+                                대학 23개교가 참여했다. 단국대는 만족도 조사에서
+                                2013년 국내 대학 최초로 학생만족경영 전담 조직인
+                                CS경영센터를 설치, 친절과 소통을 바탕으로
+                                학생들의 성장과 성공을 돕고 신뢰와 만족의
+                                가치경영을 실현한 내용을 높이 평가받았다. 우리
+                                대학은 △국내 최초 데이터 기반
+                                대학경영모델(DK-UCSI) 구축 △국내 최초 학생강연단
+                                「단울림」 운영 △국내 대학 최초 통합 콜센터 설치
+                                등 매번 최초와 유일이라는 수식어로 국내 대학
+                                학생만족경영을 견인해 왔다. ▲ 언론사에서 우리
+                                대학의국가고객만족도(NCSI) 선정 소식을 집중
+                                보도했다</a
+                              >
+                            </dd>
+                          </dl>
+                        </li>
+                        <li>
+                          <dl>
+                            <dt>
+                              <ul class="list_item">
+                                <li>
+                                  <a
+                                    href="https://www.dankook.ac.kr/web/kor/-550?p_p_id=Bbs_WAR_bbsportlet&amp;p_p_lifecycle=0&amp;p_p_state=normal&amp;p_p_mode=view&amp;_Bbs_WAR_bbsportlet_action=view_message&amp;_Bbs_WAR_bbsportlet_messageId=778069"
+                                    target="_blank"
+                                    >“해양치유 인재 함께 키운다” 태안군과
+                                    MOU체결</a
+                                  >
+                                </li>
+                                <li>2023.11.06</li>
+                              </ul>
+                            </dt>
+                            <dd>
+                              <a
+                                href="https://www.dankook.ac.kr/web/kor/-550?p_p_id=Bbs_WAR_bbsportlet&amp;p_p_lifecycle=0&amp;p_p_state=normal&amp;p_p_mode=view&amp;_Bbs_WAR_bbsportlet_action=view_message&amp;_Bbs_WAR_bbsportlet_messageId=778069"
+                                target="_blank"
+                                >우리 대학과 태안군이 해양치유 전문인력 양성에
+                                손을 잡았다. 지난3일(금) 태안군청에서 우리
+                                대학과태안군은 해양치유 전문인력 양성 및
+                                프로그램 개발운영을 위해 업무협약을 체결했다. ▲
+                                안순철 총장(오른쪽)과 가세로 군수(왼쪽)가 협약
+                                체결 후 기념촬영을 하고 있다 우리 대학은 지난
+                                8월 전국에서 단 두 곳만 뽑는 해양수산부
+                                「해양치유 전문인력 양성기관」에 선정됐다.
+                                해양치유는 해수를 이용한 수치료, 해양자원(해수,
+                                모래, 소금, 진흙, 해조류 등) 및 기후를 활용해
+                                질병을 예방하고 건강을 증진하는 활동이다.
+                                해양수산부는 2024년까지 1,354억을 투입해
+                                완도태안고성울진에 해양치유센터를 조성한다. 이번
+                                협약은 태안군 해양치유센터 활성화에 일조할
+                                것으로 기대를 모은다. 이번 협약을 통해 양 기관은
+                                △해양치유 산업분야 기술 및 연구개발 공동참여
+                                △해양치유 분야 인재양성 및 교육</a
+                              >
+                            </dd>
+                          </dl>
+                        </li>
+                        <li>
+                          <dl>
+                            <dt>
+                              <ul class="list_item">
+                                <li>
+                                  <a
+                                    href="https://www.dankook.ac.kr/web/kor/-550?p_p_id=Bbs_WAR_bbsportlet&amp;p_p_lifecycle=0&amp;p_p_state=normal&amp;p_p_mode=view&amp;_Bbs_WAR_bbsportlet_action=view_message&amp;_Bbs_WAR_bbsportlet_messageId=778093"
+                                    target="_blank"
+                                    >미생물학전공 재학생팀,
+                                    국제차세대융합기술학회 학부논문경진대회
+                                    최우수상</a
+                                  >
+                                </li>
+                                <li>2023.11.05</li>
+                              </ul>
+                            </dt>
+                            <dd>
+                              <a
+                                href="https://www.dankook.ac.kr/web/kor/-550?p_p_id=Bbs_WAR_bbsportlet&amp;p_p_lifecycle=0&amp;p_p_state=normal&amp;p_p_mode=view&amp;_Bbs_WAR_bbsportlet_action=view_message&amp;_Bbs_WAR_bbsportlet_messageId=778093"
+                                target="_blank"
+                              >
+                                △ 김민서, 최예슬, 한미양 양(미생물학전공,
+                                오믹스연구소 학부연구생) 생명과학부 미생물학전공
+                                재학생 팀이 지난 10월 27일에서 28일까지
+                                (사)국제차세대융합기술학회가 주최한 2023년도
+                                학부논문경진대회에서 최우수상을 수상했다.
+                                수상자는 미생물학전공 4학년 김민서, 최예슬,
+                                한미양 양이다. (사)국제차세대융합기술학회는
+                                국내에서 매년 1회 학부논문경진대회를 개최하고
+                                있으며 정보통신, 융합공학, 건축토목, 의료보건,
+                                인문사회, 문화예술콘텐츠 분과에서 다양한 연구
+                                주제가 발표되고 있다. 재학생 팀은 실시간으로
+                                DNA양의 변화를 관측할 수 있는 PCR검사 방법인
+                                qRT-PCR 진단 방법을 이용해 피부 건강 문제의
+                                조기진단 및 치료에 도움을 줄 수 있음을 제안한
+                                논문으로 최우수상을 수상했다. 김민서 양은
+                                교수님의 지도와 연구실 팀원의 협력 덕분에 좋은
+                                결과를 있을 수 있었다&amp;rd</a
+                              >
+                            </dd>
+                          </dl>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="cal_list">
+                    <ul id="dku_cal_list"></ul>
+                  </div>
+
+                  <!-- DKU NEWS E /-->
+                </div>
+              </div>
+              <!-- login_form_area E / -->
+            </div>
+            <!-- login_cont_wrap E /-->
+          </div>
+          <!-- content_area E /-->
+          <div class="m_footer_area">
+            COPYRIGHT 2022 BY DANKOOK UNIVERSITY ALL RIGHT RESERVED
+          </div>
+          <!-- footer_area S -->
+
+          <script type="text/javascript">
+            $(document).ready(function () {});
+          </script>
+          <!--  &#54411;&#53552; S -->
+          <div class="footer_area">
+            <div class="footer">
+              <ul>
+                <li class="remoteCall">대표 전화번호 : 031-8005-2114</li>
+              </ul>
+              죽전캠퍼스 경기도 용인시 수지구 죽전로 152 (우)16890 / 천안캠퍼스
+              충남 천안시 동남구 단대로 119 (우)31116<br />
+              COPYRIGHT 2022 BY DANKOOK UNIVERSITY ALL RIGHT RESERVED
+            </div>
+          </div>
+
+          <!-- &#54411;&#53552; E -->
+
+          <!-- footer_area E /-->
+        </div>
+        <!-- dankook_contanier E /-->
+      </div>
+      <!-- login_container E /-->
+    </div>
+    <!-- login_wrap E /-->
+  </body>
+</html>

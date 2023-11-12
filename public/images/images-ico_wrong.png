@@ -1,0 +1,70 @@
+
+<html>
+<head>
+<title> 일시적인 장애 </title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-cache">
+
+<link rel="stylesheet" href="/eXPortal/css/portal-signin-style.css" type="text/css">
+<script type="text/javascript" src="/eXPortal/js/jquery.min.js"></script>
+<script type="text/javascript" src="/eXPortal/js/validator.js"></script>
+<link rel="shortcut icon" href="/favicon.ico">
+
+<script type="text/javascript">
+function doHistoryBack() {
+    window.history.back();
+}
+</script>
+</head>
+<body class="bg_join">
+  <form id="signinConfirmFrm" name="signinConfirmFrm" method="post" onsubmit="return false;">
+    <div id="wrap_join">
+      <div id="top_wrap_join">
+        <div class="top_menu_area">
+        </div>
+      </div>
+      
+      <!-- 컨텐츠 영역 S-->
+      <div id="content_area_join"> 
+        <!-- 컨텐츠 S-->
+        <div id="content_join"> 
+          <h2>&#xc624;&#xb958;&#xc548;&#xb0b4;</h2>
+          <h3 class="mt40 mb20">&#xc624;&#xb958;&#xc548;&#xb0b4;</h3>
+          <div class="join_from">
+            <legend class="blind">&#xc624;&#xb958;&#xc548;&#xb0b4;</legend>
+            <div class="row_group">
+              <div id="" class="join_row2">
+                <p class="ico04"><img src="/eXPortal/images/join/ico_join_04.gif" alt="img"></p>
+                <ul class="finish_box">
+                  <li><span class="rtxt">&#xc624;&#xb958;&#xc548;&#xb0b4;</span></li>
+                </ul>
+                <ul class="info_box">
+                  <li>&#xc8c4;&#xc1a1;&#xd569;&#xb2c8;&#xb2e4;. &#xc11c;&#xbe44;&#xc2a4; &#xcc98;&#xb9ac;&#xc911; &#xc624;&#xb958;&#xac00; &#xbc1c;&#xc0dd;&#xd558;&#xc600;&#xc2b5;&#xb2c8;&#xb2e4;.</li>
+
+                </ul>
+              </div>
+            </div>
+          </div>
+          <p class="btn_board_c mt40"><a href="#" class="btn_ok2" onclick="javascript:doHistoryBack();">&#xc774;&#xc804;&#xd654;&#xba74;</a></p>
+          <!-- 로그인 제한 안내 E--> 
+        </div>
+        <!-- 컨텐츠 S--> 
+      </div>
+      <!-- 컨텐츠 영역 E--> 
+    </div>
+  </form>
+  
+  <!-- 풋터 S -->
+  <div id="footer_area_join">
+    <div class="footer">
+      <ul>
+        <li>죽전캠퍼스 경기도 용인시 수지구 죽전로 152 (우)16890 / 천안캠퍼스 충남 천안시 동남구 단대로 119 (우)31116 통합콜센터 : 1899-3700</li>
+        <li>COPYRIGHT 2022 BY DANKOOK UNIVERSITY ALL RIGHT RESERVED</li>
+      </ul>
+    </div>
+  </div>
+  <!-- 풋터 E -->
+  
+</body>
+</html>
